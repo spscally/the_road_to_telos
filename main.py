@@ -1,4 +1,6 @@
 import road
+import game
 
-test_road = road.Road(14, 7)
-print(test_road)
+first_road = road.Road(16, 10)
+telos_game = game.Game(first_road)
+telos_game.play()

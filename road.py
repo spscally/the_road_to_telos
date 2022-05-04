@@ -13,6 +13,24 @@ class Road:
     def vert_boundary(self):
         return '+' + ('-' * self.width) + '+\n'
 
+    def move(self, delta_r, delta_c):
+        self.player_r += delta_r
+        if self.player_r < 0:
+            self.player_r = 0
+        elif self.player_r >= self.height:
+            self.player_r = self.height - 1
+
+        self.player_c += delta_c
+        if self.player_c < 0:
+            self.player_c = 0
+        elif self.player_c >= self.width:
+            self.player_c = self.width - 1
+
+        return (self.player_r, self.player_c)
+
+    def at_telos(self):
+        return self.player_r == self.height - 1 and self.player_c == self.width - 1
+
     def update_row(self, row, col, char):
         """
             row:  str row to update
