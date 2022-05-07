@@ -2,15 +2,16 @@ from time import sleep
 
 import term
 
+from move import Move
 
 class Game:
 
     DELAY_MS = 25
 
-    UP_BUTTON = b'w'
-    LEFT_BUTTON = b'a'
-    DOWN_BUTTON = b's'
-    RIGHT_BUTTON = b'd'
+    UP_BUTTONS = [b'w', 'w']
+    LEFT_BUTTONS = [b'a', 'a']
+    DOWN_BUTTONS = [b's', 's']
+    RIGHT_BUTTONS = [b'd', 'd']
 
     def __init__(self, road):
         self.road = road
@@ -25,13 +26,13 @@ class Game:
                 return
 
             char = term.getch()
-            if char == self.UP_BUTTON:
-                self.road.move(-1, 0)
-            elif char == self.LEFT_BUTTON:
-                self.road.move(0, -1)
-            elif char == self.DOWN_BUTTON:
-                self.road.move(1, 0)
-            elif char == self.RIGHT_BUTTON:
-                self.road.move(0, 1)
+            if char in self.UP_BUTTONS:
+                self.road.move_player(Move.UP)
+            elif char in self.LEFT_BUTTONS:
+                self.road.move_player(Move.LEFT)
+            elif char in self.DOWN_BUTTONS:
+                self.road.move_player(Move.DOWN)
+            elif char in self.RIGHT_BUTTONS:
+                self.road.move_player(Move.RIGHT)
 
             sleep(self.DELAY_MS / 1000)
