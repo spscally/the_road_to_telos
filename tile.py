@@ -1,11 +1,13 @@
 class Tile:
 
+    INVISIBLE_CHAR = '.'
+
     def __init__(self, char, passable):
         self.char = char
         self.passable = passable
-
-    def is_passable(self):
-        return self.passable
+        self.visible = False
 
     def __str__(self):
-        return self.char
+        if self.visible:
+            return self.char
+        return self.INVISIBLE_CHAR

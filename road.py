@@ -3,10 +3,9 @@ from tile import Tile
 
 class Road:
 
-    PLAYER_CHAR = 'I'
+    PLAYER_CHAR = 'i'
     TELOS_CHAR = 'T'
-    EMPTY_CHAR = '.'
-    VISITED_CHAR = 'x'
+    EMPTY_CHAR = ' '
 
     def __init__(self, width, height):
         self.width = width
@@ -15,48 +14,68 @@ class Road:
         self.player_r = 0
         self.player_c = 0
 
-        empty_tile = Tile(self.EMPTY_CHAR, True)
-        self.tiles = [[empty_tile for c in range(0, self.width)] for r in range(0, self.height)]
+        self.tiles = [[Tile(self.EMPTY_CHAR, True) for c in range(0, self.width)] for r in range(0, self.height)]
+
         self.tiles[0][0] = self.PLAYER_CHAR
         self.tiles[-1][-1] = self.TELOS_CHAR
+        self.set_visible_around_player()
 
     def vert_boundary(self):
         return '+' + ('-' * self.width) + '+\n'
 
     def move_player(self, move):
 
-        new_location = (self.player_r, self.player_c)
+        new_r = self.player_r
+        new_c = self.player_c
+
         if move == Move.UP:
-            new_location = (self.player_r - 1, self.player_c)
+            new_r = self.player_r - 1
         elif move == Move.LEFT:
-            new_location = (self.player_r, self.player_c - 1)
+            new_c = self.player_c - 1
         elif move == Move.DOWN:
-            new_location = (self.player_r + 1, self.player_c)
+            new_r = self.player_r + 1
         elif move == Move.RIGHT:
-            new_location = (self.player_r, self.player_c + 1)
+            new_c = self.player_c + 1
 
-        if self.is_valid_player_location(new_location):
-            self.tiles[new_location[0]][new_location[1]] = self.PLAYER_CHAR
-            self.tiles[self.player_r][self.player_c] = Tile(self.VISITED_CHAR, False)
+        if self.is_valid_player_location(new_r, new_c):
+            self.tiles[new_r][new_c] = self.PLAYER_CHAR
+            self.tiles[self.player_r][self.player_c] = Tile(self.EMPTY_CHAR, True)
 
-            self.player_r = new_location[0]
-            self.player_c = new_location[1]
+            self.player_r = new_r
+            self.player_c = new_c
+
+            self.set_visible_around_player()
 
         return (self.player_r, self.player_c)
 
-    def is_valid_player_location(self, new_location):
-        new_r = new_location[0]
-        new_c = new_location[1]
-
-        if new_r < 0 or new_r >= self.height:
-            return False
-        if new_c < 0 or new_c >= self.width:
+    def is_valid_player_location(self, r, c):
+        if self.is_on_road(r, c) == False:
             return False
 
-        tile = self.tiles[new_r][new_c]
+        tile = self.tiles[r][c]
         if type(tile) == Tile:
-            return tile.is_passable()
+            return tile.passable
         return tile in [None, self.TELOS_CHAR]
+
+    def is_on_road(self, r, c):
+        if r < 0 or r >= self.height:
+            return False
+        if c < 0 or c >= self.width:
+            return False
+        return True
+
+    def set_visible_around_player(self):
+        for r_delta in [-1, 0, 1]:
+            for c_delta in [-1, 0, 1]:
+                new_r = self.player_r + r_delta
+                new_c = self.player_c + c_delta
+
+                if self.is_on_road(new_r, new_c) == False:
+                    continue
+                tile = self.tiles[new_r][new_c]
+                if type(tile) != Tile:
+                    continue
+                tile.visible = True
 
     def at_telos(self):
         return self.player_r == self.height - 1 and self.player_c == self.width - 1
