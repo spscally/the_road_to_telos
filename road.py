@@ -1,23 +1,20 @@
+from event import Event
 from move import Move
 from tile import Tile
 
 class Road:
 
-    PLAYER_CHAR = 'i'
-    TELOS_CHAR = 'T'
-    EMPTY_CHAR = ' '
-
-    def __init__(self, width, height):
+    def __init__(self, width, height, generator):
         self.width = width
         self.height = height
 
         self.player_r = 0
         self.player_c = 0
 
-        self.tiles = [[Tile(self.EMPTY_CHAR, True) for c in range(0, self.width)] for r in range(0, self.height)]
+        self.tiles = generator.generate(width, height)
 
-        self.tiles[0][0] = self.PLAYER_CHAR
-        self.tiles[-1][-1] = self.TELOS_CHAR
+        self.tiles[0][0] = Tile.PLAYER_CHAR
+        self.tiles[-1][-1] = Tile.TELOS_CHAR
         self.set_visible_around_player()
 
     def vert_boundary(self):
@@ -37,16 +34,21 @@ class Road:
         elif move == Move.RIGHT:
             new_c = self.player_c + 1
 
+        event = Event.NONE
         if self.is_valid_player_location(new_r, new_c):
-            self.tiles[new_r][new_c] = self.PLAYER_CHAR
-            self.tiles[self.player_r][self.player_c] = Tile(self.EMPTY_CHAR, True)
+
+            if self.tiles[new_r][new_c].char == Tile.ENEMY_CHAR:
+                event = Event.FIGHT
+
+            self.tiles[new_r][new_c] = Tile.PLAYER_CHAR
+            self.tiles[self.player_r][self.player_c] = Tile(Tile.EMPTY_CHAR, True)
 
             self.player_r = new_r
             self.player_c = new_c
 
             self.set_visible_around_player()
 
-        return (self.player_r, self.player_c)
+        return event
 
     def is_valid_player_location(self, r, c):
         if self.is_on_road(r, c) == False:
@@ -55,7 +57,7 @@ class Road:
         tile = self.tiles[r][c]
         if type(tile) == Tile:
             return tile.passable
-        return tile in [None, self.TELOS_CHAR]
+        return tile in [None, Tile.TELOS_CHAR]
 
     def is_on_road(self, r, c):
         if r < 0 or r >= self.height:

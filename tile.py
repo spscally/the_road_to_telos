@@ -1,5 +1,10 @@
 class Tile:
 
+    PLAYER_CHAR = 'i'
+    TELOS_CHAR = 'T'
+    EMPTY_CHAR = ' '
+    OBSTACLE_CHAR = 'x'
+    ENEMY_CHAR = 'a'
     INVISIBLE_CHAR = '.'
 
     def __init__(self, char, passable):
